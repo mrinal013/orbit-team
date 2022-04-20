@@ -52,7 +52,64 @@ class Orbit_Team_Public {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
+        add_shortcode('team_members', array( $this, 'team_members_shortcode_callback' ) );
+
 	}
+
+    public function team_members_shortcode_callback($atts) {
+        $attributes = shortcode_atts( array(
+            'number'    => 4,
+            'position'  => 'top',
+            'button'    => true
+        ), $atts );
+        $number = $attributes['number'];
+        $team_args = array(
+            'post_type'         => 'team',
+            'posts_per_page'    =>  $number,
+        );
+
+        $team_query = new WP_Query($team_args);
+
+//        echo '<pre>';
+//        print_r($team_query->posts);
+//        echo '</pre>';
+
+        ob_start();
+
+        if ( $team_query->have_posts() ) :
+        ?>
+        <div class="team-wrapper">
+            <?php
+            while ( $team_query->have_posts() ) :
+                $team_query->the_post();
+                $image = get_the_post_thumbnail_url();
+                $position = 'Developer';
+            ?>
+            <div class="team-member">
+                <a href="<?php echo get_permalink(); ?>">
+                    <img src="<?php echo $image; ?>" alt="">
+                </a>
+                <a href="<?php echo get_permalink(); ?>">
+                    <h2><?php the_title(); ?></h2>
+                </a>
+                <p><?php echo $position; ?></p>
+            </div>
+            <?php
+            endwhile;
+            ?>
+        </div>
+            <a href="<?php echo get_post_type_archive_link('team'); ?>"  class="all-members"><button>All Members</button></a>
+        <?php
+        endif;
+        return ob_get_clean();
+    }
+
+    public function team_members_template($template) {
+        if ( is_post_type_archive('team') ) {
+            $template = plugin_dir_path(__FILE__) . 'team-members.php';
+        }
+        return $template;
+    }
 
 	/**
 	 * Register the stylesheets for the public-facing side of the site.

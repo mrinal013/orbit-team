@@ -154,6 +154,8 @@ class Orbit_Team {
 
 		$plugin_admin = new Orbit_Team_Admin( $this->get_plugin_name(), $this->get_version() );
 
+        $this->loader->add_action( 'init', $plugin_admin, 'orbit_team_post_type' );
+        $this->loader->add_action( 'init', $plugin_admin, 'member_type_category' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
@@ -170,9 +172,12 @@ class Orbit_Team {
 
 		$plugin_public = new Orbit_Team_Public( $this->get_plugin_name(), $this->get_version() );
 
+//        $this->loader->add_shortcode( 'team_members', $plugin_public, 'team_member_shortcode_cb' );
+
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
+        $this->loader->add_filter( 'template_include', $plugin_public, 'team_members_template' );
 	}
 
 	/**
